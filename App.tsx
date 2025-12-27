@@ -80,12 +80,13 @@ const SectionTitle = ({ children, subtitle }: { children?: React.ReactNode, subt
 export default function App() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const careerCarouselRef = useRef<HTMLDivElement>(null);
+  const resultsCarouselRef = useRef<HTMLDivElement>(null);
 
-  const scrollCareer = (direction: 'left' | 'right') => {
-    if (careerCarouselRef.current) {
-      const { scrollLeft, clientWidth } = careerCarouselRef.current;
+  const scrollCarousel = (ref: React.RefObject<HTMLDivElement | null>, direction: 'left' | 'right') => {
+    if (ref.current) {
+      const { scrollLeft, clientWidth } = ref.current;
       const scrollTo = direction === 'left' ? scrollLeft - clientWidth : scrollLeft + clientWidth;
-      careerCarouselRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
+      ref.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
     }
   };
 
@@ -171,7 +172,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* 3. BLOCO RESULTADOS REAIS (CARROSSEL) */}
+      {/* 3. BLOCO RESULTADOS REAIS (CARROSSEL COM NAVEGAÇÃO) */}
       <section className="py-24 bg-white overflow-hidden">
         <div className="container mx-auto px-6">
           <SectionTitle subtitle="Deslize para ver as transformações reais de pacientes que confiaram no meu trabalho.">
@@ -179,12 +180,30 @@ export default function App() {
           </SectionTitle>
         </div>
 
-        <div className="relative group">
-          <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-4 px-6 md:px-[15%] pb-8">
+        <div className="relative group max-w-[1400px] mx-auto">
+          {/* Setas de Navegação (Desktop) */}
+          <button 
+            onClick={() => scrollCarousel(resultsCarouselRef, 'left')}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-4 bg-white/80 backdrop-blur hover:bg-[#d4af37] hover:text-white rounded-full shadow-lg transition-all hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          
+          <button 
+            onClick={() => scrollCarousel(resultsCarouselRef, 'right')}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-4 bg-white/80 backdrop-blur hover:bg-[#d4af37] hover:text-white rounded-full shadow-lg transition-all hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100"
+          >
+            <ChevronRight size={24} />
+          </button>
+
+          <div 
+            ref={resultsCarouselRef}
+            className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-4 px-6 md:px-[10%] pb-8"
+          >
             {IMAGES.results.map((img, i) => (
               <div 
                 key={i} 
-                className="min-w-[85%] md:min-w-[45%] lg:min-w-[30%] snap-center relative aspect-[4/5] overflow-hidden rounded-2xl bg-gray-100 cursor-pointer shadow-xl"
+                className="min-w-[85%] md:min-w-[45%] lg:min-w-[30%] snap-center relative aspect-[4/5] overflow-hidden rounded-2xl bg-gray-100 cursor-pointer shadow-xl flex-shrink-0"
                 onClick={() => setSelectedImage(img)}
               >
                 <img 
@@ -327,14 +346,14 @@ export default function App() {
         <div className="relative group max-w-[1400px] mx-auto">
           {/* Setas de Navegação (Desktop) */}
           <button 
-            onClick={() => scrollCareer('left')}
+            onClick={() => scrollCarousel(careerCarouselRef, 'left')}
             className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-4 bg-white/80 backdrop-blur hover:bg-[#d4af37] hover:text-white rounded-full shadow-lg transition-all hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100"
           >
             <ChevronLeft size={24} />
           </button>
           
           <button 
-            onClick={() => scrollCareer('right')}
+            onClick={() => scrollCarousel(careerCarouselRef, 'right')}
             className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-4 bg-white/80 backdrop-blur hover:bg-[#d4af37] hover:text-white rounded-full shadow-lg transition-all hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100"
           >
             <ChevronRight size={24} />
@@ -420,8 +439,7 @@ export default function App() {
               rel="noopener noreferrer" 
               className="text-gray-400 hover:text-[#d4af37] transition-colors flex items-center gap-2 text-sm"
             >
-              <Instagram size={20} />
-              @dradiessicalorandi
+              <span className="flex items-center gap-2"><Instagram size={20} /> @dradiessicalorandi</span>
             </a>
           </div>
 
